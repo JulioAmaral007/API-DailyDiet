@@ -8,23 +8,24 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(uuid())
-  name     String
-  email    String @unique
-  password String
-  meals    Meal[]
+  id            String @id @default(uuid())
+  name          String
+  email         String @unique
+  password_hash String
+  Diet          Diet[]
 
   @@map("users")
 }
 
-model Meal {
+model Diet {
   id          String   @id @default(uuid())
   name        String
-  description String   @unique
-  inORoutDiet String
+  description String
   date        DateTime @default(now())
-  authorId    String   @map("author_id")
-  author      User     @relation(fields: [authorId], references: [id])
+  isDiet      Boolean  @default(false)
 
-  @@map("meals")
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  @@map("diets")
 }
