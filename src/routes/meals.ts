@@ -149,23 +149,38 @@ export async function mealsRoutes(app: FastifyInstance) {
     },
   )
 
-  // // Listando todas refeições apenas do usuário
-  // app.get('/', { preHandler: [checkSessionIdExists] }, async (request) => {
-  //   const { sessionId } = request.cookies
+  // Listando todas refeições apenas do usuário
+  app.get(
+    '/',
+    { preHandler: [checkSessionIdExists] },
+    async (request, reply) => {
+      const { sessionId } = request.cookies
 
-  //   const [user] = await knex('users')
-  //     .where('session_id', sessionId)
-  //     .select('id')
+      // Buscando o id do usuário com base no session_id
+      const user = await prismaClient.user.findFirst({
+        where: {
+          session_id: sessionId,
+        },
+      })
 
-  //   const userId = user.id
+      const userId = user?.id
 
-  //   // .where('user_id', userId) -> Selecionar apenas onde a coluna user_id seja correspondende ao id do usuário que criou o prato
-  //   const meals = await knex('meals').where('user_id', userId).select()
+      if (!userId) {
+        reply.status(401).send()
+      }
 
-  //   return {
-  //     meals,
-  //   }
-  // })
+      // .where('user_id', userId) -> Selecionar apenas onde a coluna user_id seja correspondende ao id do usuário que criou o prato
+      const meals = await prismaClient.diet.findMany({
+        where: {
+          userId,
+        },
+      })
+
+      return {
+        meals,
+      }
+    },
+  )
 
   // // Listando uma refeição específica do usuário
   // app.get(

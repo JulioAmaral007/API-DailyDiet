@@ -15,9 +15,9 @@ POST http://localhost:3030/meals
 content-type: application/json
 
 {
-    "name": "Strogonoff",
-    "description": "strogonoff de frango com batata palha",
-    "isDiet": false
+    "name": "Pizza",
+    "description": "pizza de calabresa e queijo",
+    "isDiet": true
 }
 
 ### Registrar uma refeição
@@ -30,6 +30,8 @@ content-type: application/json
     "isDiet": true
 }
 
-### Registrar uma refeição
-DELETE  http://localhost:3030/meals/02fdafb0-3ae8-4279-a72d-bb73c1f400b7
-content-type: application/json
+### Deletar uma refeição
+DELETE http://localhost:3030/meals/02fdafb0-3ae8-4279-a72d-bb73c1f400b7
+
+### Mostrar todas as refeições de um usuário
+GET http://localhost:3030/meals
