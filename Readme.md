@@ -16,7 +16,7 @@ Quando o usuário se registra, um cookie é criado e armazenado. Utilizamos esse
 
   - [x] Deve ser possível criar um usuário
   - [x] Deve ser possível identificar o usuário entre as requisições
-  - [ ] Deve ser possível registrar uma refeição feita, com as seguintes informações:  
+  - [x] Deve ser possível registrar uma refeição feita, com as seguintes informações:  
       - Nome
       - Descrição
       - Data e Hora
