@@ -10,7 +10,7 @@ export const app = fastify()
 app.register(cookie)
 
 app.register(usersRoutes)
-app.register(mealsRoutes)
+app.register(mealsRoutes, { prefix: '/meals' })
 
 app.setErrorHandler((error, _, reply) => {
   if (error instanceof ZodError) {
