@@ -22,10 +22,6 @@ export async function mealsRoutes(app: FastifyInstance) {
         reply.status(401).send()
       }
 
-      if (!user) {
-        reply.status(401).send()
-      }
-
       const userId = user.id
 
       // Após a identificação do usuário, armazena o dado de seu id para posteriormente adicionar na tabela de meals junto ao prato
@@ -56,7 +52,7 @@ export async function mealsRoutes(app: FastifyInstance) {
   app.put(
     '/:id',
     { preHandler: [checkSessionIdExists] },
-    async (request, response) => {
+    async (request, reply) => {
       // Capturando o parâmetro id pelos params e tipando
       const getMealParamsSchema = z.object({
         id: z.string().uuid(),
@@ -104,12 +100,52 @@ export async function mealsRoutes(app: FastifyInstance) {
 
       // Caso não seja encontrada no db
       if (!meal) {
-        return response.status(401).send({
+        return reply.status(401).send({
           error: 'Refeição não encontrada',
         })
       }
 
-      return response.status(202).send()
+      return reply.status(202).send()
+    },
+  )
+
+  // Apagando uma refeição cadastrada
+  app.delete(
+    '/:id',
+    { preHandler: [checkSessionIdExists] },
+    async (request, reply) => {
+      const getMealParamsSchema = z.object({
+        id: z.string().uuid(),
+      })
+
+      const params = getMealParamsSchema.parse(request.params)
+
+      // Buscando o usuário
+      const { sessionId } = request.cookies
+
+      // Buscando o id do usuário com base no session_id
+      const user = await prismaClient.user.findFirst({
+        where: {
+          session_id: sessionId,
+        },
+      })
+
+      const userId = user?.id
+
+      if (!userId) {
+        reply.status(401).send()
+      }
+
+      // Buscando a refeição existente, passando o id que veio por params e o id do usuário capturado pelo session_id
+      const mealId = params.id
+
+      await prismaClient.diet.delete({
+        where: {
+          id: mealId,
+        },
+      })
+
+      return reply.status(202).send('Refeição deletada com sucesso')
     },
   )
 
@@ -166,42 +202,6 @@ export async function mealsRoutes(app: FastifyInstance) {
   //     }
 
   //     return { meal }
-  //   },
-  // )
-
-  // // Apagando uma refeição cadastrada
-  // app.delete(
-  //   '/:id',
-  //   { preHandler: [checkSessionIdExists] },
-  //   async (request, response) => {
-  //     const getMealParamsSchema = z.object({
-  //       id: z.string().uuid(),
-  //     })
-
-  //     const params = getMealParamsSchema.parse(request.params)
-
-  //     // Buscando o usuário
-  //     const { sessionId } = request.cookies
-
-  //     const [user] = await knex('users')
-  //       .where('session_id', sessionId)
-  //       .select('id')
-
-  //     const userId = user.id
-
-  //     const meal = await knex('meals')
-  //       .where('id', params.id)
-  //       .andWhere('user_id', userId)
-  //       .first()
-  //       .delete()
-
-  //     if (!meal) {
-  //       return response.status(401).send({
-  //         error: 'Unauthorized',
-  //       })
-  //     }
-
-  //     return response.status(202).send('Refeição deletada com sucesso')
   //   },
   // )
 

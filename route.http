@@ -4,7 +4,7 @@ content-type: application/json
 
 {
     "name": "Cezar",
-    "email": "jczra@gmail.com",
+    "email": "jczreper@gmail.com",
     "password": "testando",
     "weight": 68,
     "height": 175
@@ -13,7 +13,6 @@ content-type: application/json
 ### Registrar uma refeição
 POST http://localhost:3030/meals
 content-type: application/json
-Authorization: 8b4ad155-819f-467f-9f4d-f93b1ba2d308
 
 {
     "name": "Strogonoff",
@@ -24,10 +23,13 @@ Authorization: 8b4ad155-819f-467f-9f4d-f93b1ba2d308
 ### Registrar uma refeição
 PUT http://localhost:3030/meals/be30da5b-d54c-4d8b-be15-d58b423ed808
 content-type: application/json
-Authorization: 8b4ad155-819f-467f-9f4d-f93b1ba2d308
 
 {
     "name": "Pizza",
     "description": "pizza de calabresa e queijo",
     "isDiet": true
 }
+
+### Registrar uma refeição
+DELETE  http://localhost:3030/meals/02fdafb0-3ae8-4279-a72d-bb73c1f400b7
+content-type: application/json
