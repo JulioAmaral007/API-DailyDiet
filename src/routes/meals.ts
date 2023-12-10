@@ -223,59 +223,50 @@ export async function mealsRoutes(app: FastifyInstance) {
     },
   )
 
-  // // Resumo das refeições
-  // app.get(
-  //   '/summary',
-  //   { preHandler: [checkSessionIdExists] },
-  //   async (request) => {
-  //     // .sum('coluna') => Soma a quantidade de valores de uma coluna do db
+  // Resumo das refeições
+  app.get(
+    '/summary',
+    { preHandler: [checkSessionIdExists] },
+    async (request, reply) => {
+      // Buscando o usuário
+      const { sessionId } = request.cookies
 
-  //     // Buscando o usuário
-  //     const { sessionId } = request.cookies
+      // Buscando o id do usuário com base no session_id
+      const user = await prismaClient.user.findFirst({
+        where: {
+          session_id: sessionId,
+        },
+      })
 
-  //     const [user] = await knex('users')
-  //       .where('session_id', sessionId)
-  //       .select('id')
+      const userId = user?.id
 
-  //     const userId = user.id
+      if (!userId) {
+        reply.status(401).send()
+      }
 
-  //     const [count] = await knex('meals')
-  //       .count('id', {
-  //         as: 'Total de refeições registradas',
-  //       })
-  //       .where('user_id', userId)
+      const count = await prismaClient.diet.count()
 
-  //     const refDieta = await knex('meals')
-  //       .count('id', { as: 'Total de refeições dentro da dieta' })
-  //       .where('isOnTheDiet', true)
-  //       .andWhere('user_id', userId)
+      const isOnTheDiet = await prismaClient.diet.count({
+        where: {
+          isDiet: true,
+        },
+      })
 
-  //     const refForaDieta = await knex('meals')
-  //       .count('id', { as: 'Total de refeições fora da dieta' })
-  //       .where('isOnTheDiet', false)
-  //       .andWhere('user_id', userId)
+      const isOffTheDiet = await prismaClient.diet.count({
+        where: {
+          isDiet: false,
+        },
+      })
 
-  //     const summary = {
-  //       'Total de refeições registradas': parseInt(
-  //         JSON.parse(JSON.stringify(count))['Total de refeições registradas'],
-  //       ),
+      const summary = {
+        count,
+        isOnTheDiet,
+        isOffTheDiet,
+      }
 
-  //       'Total de refeições dentro da dieta': parseInt(
-  //         JSON.parse(JSON.stringify(refDieta))[0][
-  //         'Total de refeições dentro da dieta'
-  //         ],
-  //       ),
-
-  //       'Total de refeições fora da dieta': parseInt(
-  //         JSON.parse(JSON.stringify(refForaDieta))[0][
-  //         'Total de refeições fora da dieta'
-  //         ],
-  //       ),
-  //     }
-
-  //     return {
-  //       summary,
-  //     }
-  //   },
-  // )
+      return {
+        summary,
+      }
+    },
+  )
 }
