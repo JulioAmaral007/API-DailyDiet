@@ -182,43 +182,46 @@ export async function mealsRoutes(app: FastifyInstance) {
     },
   )
 
-  // // Listando uma refeição específica do usuário
-  // app.get(
-  //   '/:id',
-  //   { preHandler: [checkSessionIdExists] },
-  //   async (request, response) => {
-  //     // Capturando os parâmetros nomeados (/:id)
-  //     // Tipando
-  //     const getMealParamsSchema = z.object({
-  //       id: z.string().uuid(),
-  //     })
+  // Listando uma refeição específica do usuário
+  app.get(
+    '/:id',
+    { preHandler: [checkSessionIdExists] },
+    async (request, reply) => {
+      // Capturando os parâmetros nomeados (/:id)
+      // Tipando
+      const getMealParamsSchema = z.object({
+        id: z.string().uuid(),
+      })
 
-  //     const params = getMealParamsSchema.parse(request.params)
-  //     const { sessionId } = request.cookies
+      const params = getMealParamsSchema.parse(request.params)
+      const { sessionId } = request.cookies
 
-  //     const [user] = await knex('users')
-  //       .where('session_id', sessionId)
-  //       .select('id')
+      // Buscando o id do usuário com base no session_id
+      const user = await prismaClient.user.findFirst({
+        where: {
+          session_id: sessionId,
+        },
+      })
 
-  //     const userId = user.id
+      const userId = user?.id
 
-  //     // Buscando a refeição do db
-  //     // Buscando na tabela meals, na coluna ID, o params.id (que é o que vem da rota)
-  //     // .first() é para não retornar como array e sim como (existendo ou undefined)
-  //     const meal = await knex('meals')
-  //       .where('id', params.id)
-  //       .andWhere('user_id', userId)
-  //       .first()
+      if (!userId) {
+        reply.status(401).send()
+      }
 
-  //     if (!meal) {
-  //       return response.status(404).send({
-  //         error: 'Refeição não encontrada',
-  //       })
-  //     }
+      // Buscando a refeição do db
+      // Buscando na tabela meals, na coluna ID, o params.id (que é o que vem da rota)
+      const mealId = params.id
 
-  //     return { meal }
-  //   },
-  // )
+      const meal = await prismaClient.diet.findMany({
+        where: {
+          id: mealId,
+        },
+      })
+
+      return { meal }
+    },
+  )
 
   // // Resumo das refeições
   // app.get(

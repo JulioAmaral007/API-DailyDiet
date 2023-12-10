@@ -35,3 +35,6 @@ DELETE http://localhost:3030/meals/02fdafb0-3ae8-4279-a72d-bb73c1f400b7
 
 ### Mostrar todas as refeições de um usuário
 GET http://localhost:3030/meals
+
+### Listar uma refeição especifica
+GET http://localhost:3030/meals/857abfe8-7889-4dc1-90bd-6f257936a047
