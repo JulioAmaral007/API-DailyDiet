@@ -1,8 +1,14 @@
+import cookie from '@fastify/cookie'
 import fastify from 'fastify'
 import { ZodError } from 'zod'
 import { env } from './env'
+import { usersRoutes } from './routes/users'
 
 export const app = fastify()
+
+app.register(cookie)
+
+app.register(usersRoutes)
 
 app.setErrorHandler((error, _, reply) => {
   if (error instanceof ZodError) {
